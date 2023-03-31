@@ -17,17 +17,19 @@
   },
   "dependencies": {
     "@faker-js/faker": "^7.6.0",
-    "@mswjs/data": "^0.12.0",
+    "@mswjs/data": "^0.8.4",
     "@reduxjs/toolkit": "^1.9.3",
+    "classnames": "^2.2.6",
     "date-fns": "^2.29.3",
-    "mock-socket": "^9.2.1",
-    "msw": "^1.2.1",
+    "miragejs": "^0.1.35",
+    "mock-socket": "^9.0.3",
+    "msw": "^0.36.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^5.1.2",
     "seedrandom": "^3.0.5",
-    "txtgen": "^3.0.5"
+    "txtgen": "^2.2.6"
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^3.7.2",
@@ -36,7 +38,7 @@
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
     "@types/react-router-dom": "^5.3.3",
-    "@types/seedrandom": "^3.0.5",
+    "@types/seedrandom": "^2.2.4",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "@vitejs/plugin-react-swc": "^3.0.0",

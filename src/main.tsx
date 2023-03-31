@@ -7,13 +7,20 @@ import { Provider } from 'react-redux'
 
 import { worker } from './api/server'
 import store from './app/store'
+import { fetchUsers } from './features/users/users-slice'
 
-void worker.start({ onUnhandledRequest: 'bypass' })
+async function start() {
+  await worker.start({ onUnhandledRequest: 'bypass' })
 
-ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
-  // <React.StrictMode>
-  <Provider store={store}>
-    <App />
-  </Provider>,
-  // </React.StrictMode>,
-)
+  void store.dispatch(fetchUsers())
+
+  ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
+    // <React.StrictMode>
+    <Provider store={store}>
+      <App />
+    </Provider>,
+    // </React.StrictMode>,
+  )
+}
+
+void start()

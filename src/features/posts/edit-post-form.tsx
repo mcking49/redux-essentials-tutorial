@@ -3,7 +3,7 @@ import { useDispatch } from 'react-redux'
 import { useHistory, type match } from 'react-router-dom'
 
 import { useAppSelector } from '../../app/store'
-import { postUpdated } from './posts-slice'
+import { postUpdated, selectPostById } from './posts-slice'
 
 type Props = {
   match: match<{ postId: string }>
@@ -12,9 +12,7 @@ type Props = {
 export const EditPostForm = ({ match }: Props) => {
   const { postId } = match.params
 
-  const post = useAppSelector((state) =>
-    state.posts.find((post) => post.id === postId),
-  )
+  const post = useAppSelector((state) => selectPostById(state, postId))
 
   const [title, setTitle] = useState(post?.title)
   const [content, setContent] = useState(post?.content)

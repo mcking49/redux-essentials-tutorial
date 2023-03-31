@@ -1,12 +1,13 @@
 import { useState, type ChangeEvent } from 'react'
 
 import { useAppDispatch, useAppSelector } from '../../app/store'
-import { postAdded } from './posts-slice'
+import { addNewPost, type Status } from './posts-slice'
 
 export const AddPostForm = () => {
   const [title, setTitle] = useState('')
   const [content, setContent] = useState('')
   const [userId, setUserId] = useState('')
+  const [addRequestStatus, setAddRequestStatus] = useState<Status>('idle')
 
   const dispatch = useAppDispatch()
 
@@ -20,15 +21,24 @@ export const AddPostForm = () => {
   const onAuthorChanged = (e: ChangeEvent<HTMLSelectElement>) =>
     setUserId(e.target.value)
 
-  const onSavePostClicked = () => {
-    if (title && content) {
-      dispatch(postAdded(title, content))
-      setTitle('')
-      setContent('')
+  const canSave =
+    [title, content, userId].every(Boolean) && addRequestStatus === 'idle'
+
+  const onSavePostClicked = async () => {
+    if (canSave) {
+      try {
+        setAddRequestStatus('pending')
+        await dispatch(addNewPost({ title, content, user: userId })).unwrap()
+        setTitle('')
+        setContent('')
+        setUserId('')
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setAddRequestStatus('idle')
+      }
     }
   }
-
-  const canSave = Boolean(title) && Boolean(content) && Boolean(userId)
 
   const usersOptions = users.map((user) => (
     <option key={user.id} value={user.id}>
