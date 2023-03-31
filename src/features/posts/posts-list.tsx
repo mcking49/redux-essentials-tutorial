@@ -1,12 +1,25 @@
+import { Link } from 'react-router-dom'
+
 import { useAppSelector } from '../../app/store'
+import { PostAuthor } from './post-author'
+import { ReactionButtons } from './reaction-buttons'
 
 export const PostsList = () => {
   const posts = useAppSelector((state) => state.posts)
 
-  const renderedPosts = posts.map((post) => (
+  const orderedPosts = posts
+    .slice()
+    .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
+
+  const renderedPosts = orderedPosts.map((post) => (
     <article className="post-excerpt" key={post.id}>
       <h3>{post.title}</h3>
       <p className="post-content">{post.content.substring(0, 100)}</p>
+      <PostAuthor userId={post.user} />
+      <Link to={`/posts/${post.id}`} className="button muted-button">
+        View Post
+      </Link>
+      <ReactionButtons post={post} />
     </article>
   ))
 

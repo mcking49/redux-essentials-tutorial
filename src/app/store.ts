@@ -6,10 +6,12 @@ import {
 } from 'react-redux'
 
 import postsReducer from '../features/posts/posts-slice'
+import usersReducer from '../features/users/users-slice'
 
 const store = configureStore({
   reducer: {
     posts: postsReducer,
+    users: usersReducer,
   },
 })
 
