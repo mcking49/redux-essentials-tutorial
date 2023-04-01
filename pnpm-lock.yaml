@@ -13,6 +13,9 @@ dependencies:
   classnames:
     specifier: ^2.2.6
     version: 2.2.6
+  clsx:
+    specifier: ^1.2.1
+    version: 1.2.1
   date-fns:
     specifier: ^2.29.3
     version: 2.29.3
@@ -48,6 +51,9 @@ devDependencies:
   '@ianvs/prettier-plugin-sort-imports':
     specifier: ^3.7.2
     version: 3.7.2(prettier@2.8.7)
+  '@types/classnames':
+    specifier: ^2.3.1
+    version: 2.3.1
   '@types/eslint':
     specifier: ^8.37.0
     version: 8.37.0
@@ -857,6 +863,13 @@ packages:
       '@swc/core-win32-x64-msvc': 1.3.44
     dev: true
 
+  /@types/classnames@2.3.1:
+    resolution: {integrity: sha512-zeOWb0JGBoVmlQoznvqXbE0tEC/HONsnoUNH19Hc96NFsTAwTXbTqb8FMYkru1F/iqp7a18Ws3nWJvtA1sHD1A==}
+    deprecated: This is a stub types definition. classnames provides its own type definitions, so you do not need this installed.
+    dependencies:
+      classnames: 2.2.6
+    dev: true
+
   /@types/cookie@0.4.1:
     resolution: {integrity: sha512-XW/Aa8APYr6jSVVA1y/DEIZX0/GMKLEVekNG727R8cs56ahETkRAy/3DR7+fJyh7oUgGwNQaRfXCun0+KbWY7Q==}
     dev: false
@@ -1369,7 +1382,6 @@ packages:
 
   /classnames@2.2.6:
     resolution: {integrity: sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==}
-    dev: false
 
   /cli-cursor@3.1.0:
     resolution: {integrity: sha512-I/zHAwsKf9FqGoXM4WWRACob9+SNukZTd94DWF57E4toouRulbCxcUh6RKUEOQlYTHJnzkPMySvPNaaSLNfLZw==}
@@ -1400,6 +1412,11 @@ packages:
   /clone@1.0.4:
     resolution: {integrity: sha512-JQHZ2QMW6l3aH/j6xCqQThY/9OH4D/9ls34cgkUBiEeocRTU04tHfKPBsUK1PqZCUQM7GiA0IIXJSuXHI64Kbg==}
     engines: {node: '>=0.8'}
+    dev: false
+
+  /clsx@1.2.1:
+    resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
+    engines: {node: '>=6'}
     dev: false
 
   /color-convert@1.9.3:

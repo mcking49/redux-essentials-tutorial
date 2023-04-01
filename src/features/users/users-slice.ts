@@ -1,4 +1,8 @@
-import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
+import {
+  createAsyncThunk,
+  createEntityAdapter,
+  createSlice,
+} from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
 
@@ -12,21 +16,21 @@ export const fetchUsers = createAsyncThunk('users/fetchUsers', async () => {
   return response.data as User[]
 })
 
-const initialState: User[] = [
-  { id: '0', name: 'Tianna Jenkins' },
-  { id: '1', name: 'Kevin Grant' },
-  { id: '2', name: 'Madison Price' },
-]
+const usersAdapter = createEntityAdapter<User>()
+
+const initialState = usersAdapter.getInitialState()
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(fetchUsers.fulfilled, (_, action) => {
-      return action.payload
-    })
+    // eslint-disable-next-line @typescript-eslint/unbound-method
+    builder.addCase(fetchUsers.fulfilled, usersAdapter.setAll)
   },
 })
 
 export default usersSlice.reducer
+
+export const { selectAll: selectAllUsers, selectById: selectUserById } =
+  usersAdapter.getSelectors()

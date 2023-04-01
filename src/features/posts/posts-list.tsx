@@ -1,18 +1,25 @@
-import { useEffect } from 'react'
+import { memo, useEffect } from 'react'
+import { type EntityId } from '@reduxjs/toolkit'
 import { Link } from 'react-router-dom'
 
 import { useAppDispatch, useAppSelector } from '../../app/store'
 import { Spinner } from '../../components/Spinner'
 import { PostAuthor } from './post-author'
-import { fetchPosts, selectAllPosts, type Post } from './posts-slice'
+import { fetchPosts, selectPostById, selectPostIds } from './posts-slice'
 import { ReactionButtons } from './reaction-buttons'
 import { TimeAgo } from './time-ago'
 
 type PostExcerptProps = {
-  post: Post
+  postId: EntityId
 }
 
-const PostExcerpt = ({ post }: PostExcerptProps) => {
+const PostExcerptComponent = ({ postId }: PostExcerptProps) => {
+  const post = useAppSelector((state) => selectPostById(state, postId))
+
+  if (!post) {
+    return null
+  }
+
   return (
     <article className="post-excerpt">
       <h3>{post.title}</h3>
@@ -30,9 +37,11 @@ const PostExcerpt = ({ post }: PostExcerptProps) => {
   )
 }
 
+const PostExcerpt = memo(PostExcerptComponent)
+
 export const PostsList = () => {
   const dispatch = useAppDispatch()
-  const posts = useAppSelector(selectAllPosts)
+  const orderedPostIds = useAppSelector(selectPostIds)
   const postStatus = useAppSelector((state) => state.posts.status)
   const error = useAppSelector((state) => state.posts.error)
 
@@ -50,10 +59,9 @@ export const PostsList = () => {
       {postStatus === 'loading' && <Spinner text="Loading..." />}
 
       {postStatus === 'succeeded' &&
-        posts
-          .slice()
-          .sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
-          .map((post) => <PostExcerpt key={post.id} post={post} />)}
+        orderedPostIds.map((postId) => (
+          <PostExcerpt key={postId} postId={postId} />
+        ))}
 
       {postStatus === 'failed' && <div>{error}</div>}
     </section>

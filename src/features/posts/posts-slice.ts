@@ -1,5 +1,7 @@
 import {
   createAsyncThunk,
+  createEntityAdapter,
+  createSelector,
   createSlice,
   type PayloadAction,
 } from '@reduxjs/toolkit'
@@ -18,16 +20,10 @@ export const reactionEmoji = {
   eyes: '👀',
 } as const
 
-type PostsState = {
-  posts: Post[]
-  status: Status
-  error?: string | null
-}
-
 export const addNewPost = createAsyncThunk(
   'posts/addNewPost',
   // The payload creator receives the partial `{title, content, user}` object
-  async (initialPost: Omit<Post, 'id' | 'reactions'>) => {
+  async (initialPost: Omit<Post, 'id' | 'reactions' | 'date'>) => {
     // We send the initial data to the fake API server
     const response = await client.post('/fakeApi/posts', initialPost)
     // The response includes the complete post object, including unique ID
@@ -44,16 +40,19 @@ export type Post = {
   id: string
   title: string
   content: string
-  user?: string
-  date?: string
+  user: string
+  date: string
   reactions: Record<keyof typeof reactionEmoji, number>
 }
 
-const initialState: PostsState = {
-  posts: [],
-  status: 'idle',
-  error: null,
-}
+const postsAdapter = createEntityAdapter({
+  sortComparer: (a: Post, b: Post) => b.date.localeCompare(a.date),
+})
+
+const initialState = postsAdapter.getInitialState({
+  status: 'idle' as Status,
+  error: null as string | null | undefined,
+})
 
 const postsSlice = createSlice({
   name: 'posts',
@@ -61,7 +60,7 @@ const postsSlice = createSlice({
   reducers: {
     postUpdated(state, action: PayloadAction<Post>) {
       const { id, title, content } = action.payload
-      const existingPost = state.posts.find((post) => post.id === id)
+      const existingPost = state.entities[id]
 
       if (existingPost) {
         existingPost.title = title
@@ -77,7 +76,8 @@ const postsSlice = createSlice({
       }>,
     ) {
       const { postId, reaction } = action.payload
-      const existingPost = state.posts.find((post) => post.id === postId)
+      const existingPost = state.entities[postId]
+
       if (existingPost) {
         existingPost.reactions[reaction]++
       }
@@ -90,16 +90,14 @@ const postsSlice = createSlice({
       })
       .addCase(fetchPosts.fulfilled, (state, action) => {
         state.status = 'succeeded'
-        state.posts = state.posts.concat(action.payload)
+        postsAdapter.upsertMany(state, action.payload)
       })
       .addCase(fetchPosts.rejected, (state, action) => {
         state.status = 'failed'
         state.error = action.error.message
       })
-      .addCase(addNewPost.fulfilled, (state, action) => {
-        // We can directly add the new post object to our posts array
-        state.posts.push(action.payload)
-      })
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      .addCase(addNewPost.fulfilled, postsAdapter.addOne)
   },
 })
 
@@ -107,7 +105,13 @@ export default postsSlice.reducer
 
 export const { postUpdated, reactionAdded } = postsSlice.actions
 
-export const selectAllPosts = (state: RootState) => state.posts.posts
+export const {
+  selectAll: selectAllPosts,
+  selectById: selectPostById,
+  selectIds: selectPostIds,
+} = postsAdapter.getSelectors((state: RootState) => state.posts)
 
-export const selectPostById = (state: RootState, postId: string) =>
-  state.posts.posts.find((post) => post.id === postId)
+export const selectPostsByUser = createSelector(
+  [selectAllPosts, (_state: RootState, userId: string) => userId],
+  (posts, userId) => posts.filter((post) => post.user === userId),
+)

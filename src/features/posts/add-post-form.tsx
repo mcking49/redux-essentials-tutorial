@@ -1,6 +1,7 @@
 import { useState, type ChangeEvent } from 'react'
 
 import { useAppDispatch, useAppSelector } from '../../app/store'
+import { selectAllUsers } from '../users/users-slice'
 import { addNewPost, type Status } from './posts-slice'
 
 export const AddPostForm = () => {
@@ -11,10 +12,11 @@ export const AddPostForm = () => {
 
   const dispatch = useAppDispatch()
 
-  const users = useAppSelector((state) => state.users)
+  const users = useAppSelector((state) => selectAllUsers(state.users))
 
   const onTitleChanged = (e: ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value)
+
   const onContentChanged = (e: ChangeEvent<HTMLTextAreaElement>) =>
     setContent(e.target.value)
 
@@ -72,6 +74,8 @@ export const AddPostForm = () => {
           value={content}
           onChange={onContentChanged}
         />
+
+        {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
         <button type="button" onClick={onSavePostClicked} disabled={!canSave}>
           Save Post
         </button>
