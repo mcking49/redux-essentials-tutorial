@@ -1,25 +1,19 @@
-import { memo, useEffect } from 'react'
-import { type EntityId } from '@reduxjs/toolkit'
+import { memo, useMemo } from 'react'
+import clsx from 'clsx'
 import { Link } from 'react-router-dom'
 
-import { useAppDispatch, useAppSelector } from '../../app/store'
 import { Spinner } from '../../components/Spinner'
+import { useGetPostsQuery } from '../api/api-slice'
 import { PostAuthor } from './post-author'
-import { fetchPosts, selectPostById, selectPostIds } from './posts-slice'
+import { type Post } from './posts-slice'
 import { ReactionButtons } from './reaction-buttons'
 import { TimeAgo } from './time-ago'
 
 type PostExcerptProps = {
-  postId: EntityId
+  post: Post
 }
 
-const PostExcerptComponent = ({ postId }: PostExcerptProps) => {
-  const post = useAppSelector((state) => selectPostById(state, postId))
-
-  if (!post) {
-    return null
-  }
-
+const PostExcerptComponent = ({ post }: PostExcerptProps) => {
   return (
     <article className="post-excerpt">
       <h3>{post.title}</h3>
@@ -40,30 +34,41 @@ const PostExcerptComponent = ({ postId }: PostExcerptProps) => {
 const PostExcerpt = memo(PostExcerptComponent)
 
 export const PostsList = () => {
-  const dispatch = useAppDispatch()
-  const orderedPostIds = useAppSelector(selectPostIds)
-  const postStatus = useAppSelector((state) => state.posts.status)
-  const error = useAppSelector((state) => state.posts.error)
+  const {
+    data: posts = [],
+    isError,
+    isLoading,
+    isSuccess,
+    isFetching,
+    error,
+    refetch,
+  } = useGetPostsQuery(null)
 
-  useEffect(() => {
-    if (postStatus === 'idle') {
-      // eslint-disable-next-line @typescript-eslint/no-floating-promises
-      dispatch(fetchPosts())
-    }
-  }, [dispatch, postStatus])
+  const sortedPosts = useMemo(() => {
+    const result = posts.slice()
+    result.sort((a, b) => b.date.localeCompare(a.date))
+
+    return result
+  }, [posts])
 
   return (
     <section className="posts-list">
       <h2>Posts</h2>
 
-      {postStatus === 'loading' && <Spinner text="Loading..." />}
+      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
+      <button onClick={refetch}>Refetch Posts</button>
 
-      {postStatus === 'succeeded' &&
-        orderedPostIds.map((postId) => (
-          <PostExcerpt key={postId} postId={postId} />
-        ))}
+      {isLoading && <Spinner text="Loading..." />}
 
-      {postStatus === 'failed' && <div>{error}</div>}
+      {!isLoading && isSuccess && (
+        <div className={clsx('posts-container', { disabled: isFetching })}>
+          {sortedPosts.map((post) => (
+            <PostExcerpt key={post.id} post={post} />
+          ))}
+        </div>
+      )}
+
+      {isError && <div>{error.toString()}</div>}
     </section>
   )
 }

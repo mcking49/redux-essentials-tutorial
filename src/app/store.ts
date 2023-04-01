@@ -5,6 +5,7 @@ import {
   type TypedUseSelectorHook,
 } from 'react-redux'
 
+import { apiSlice } from '../features/api/api-slice'
 import notificationsReducer from '../features/notifications/notifications-slice'
 import postsReducer from '../features/posts/posts-slice'
 import usersReducer from '../features/users/users-slice'
@@ -14,7 +15,10 @@ const store = configureStore({
     notifications: notificationsReducer,
     posts: postsReducer,
     users: usersReducer,
+    [apiSlice.reducerPath]: apiSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat(apiSlice.middleware),
 })
 
 export type RootState = ReturnType<typeof store.getState>
