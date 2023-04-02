@@ -1,18 +1,16 @@
-import React from 'react'
 import ReactDOM from 'react-dom/client'
-
-import App from './App'
-import './index.css'
 import { Provider } from 'react-redux'
 
+import App from './App'
 import { worker } from './api/server'
 import store from './app/store'
-import { fetchUsers } from './features/users/users-slice'
+import { extendedApiSlice } from './features/users/users-slice'
+import './index.css'
 
 async function start() {
   await worker.start({ onUnhandledRequest: 'bypass' })
 
-  void store.dispatch(fetchUsers())
+  void store.dispatch(extendedApiSlice.endpoints.getUsers.initiate())
 
   ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     // <React.StrictMode>

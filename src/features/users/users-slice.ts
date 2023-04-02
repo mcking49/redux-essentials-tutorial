@@ -1,12 +1,15 @@
 import {
   createAsyncThunk,
   createEntityAdapter,
-  createSlice,
+  createSelector,
+  type EntityState,
 } from '@reduxjs/toolkit'
 
 import { client } from '../../api/client'
+import { type RootState } from '../../app/store'
+import { apiSlice } from '../api/api-slice'
 
-type User = {
+export type User = {
   id: string
   name: string
 }
@@ -20,17 +23,28 @@ const usersAdapter = createEntityAdapter<User>()
 
 const initialState = usersAdapter.getInitialState()
 
-const usersSlice = createSlice({
-  name: 'users',
-  initialState,
-  reducers: {},
-  extraReducers(builder) {
-    // eslint-disable-next-line @typescript-eslint/unbound-method
-    builder.addCase(fetchUsers.fulfilled, usersAdapter.setAll)
-  },
+export const extendedApiSlice = apiSlice.injectEndpoints({
+  endpoints: (builder) => ({
+    getUsers: builder.query<EntityState<User>, void>({
+      query: () => '/users',
+      transformResponse: (responseData: User[]) => {
+        console.log('responseData', responseData)
+        return usersAdapter.setAll(initialState, responseData)
+      },
+    }),
+  }),
 })
 
-export default usersSlice.reducer
+export const { useGetUsersQuery } = extendedApiSlice
+
+export const selectUsersResult = extendedApiSlice.endpoints.getUsers.select()
+
+const selectUsersData = createSelector(
+  selectUsersResult,
+  (usersResult) => usersResult.data,
+)
 
 export const { selectAll: selectAllUsers, selectById: selectUserById } =
-  usersAdapter.getSelectors()
+  usersAdapter.getSelectors(
+    (state: RootState) => selectUsersData(state) ?? initialState,
+  )

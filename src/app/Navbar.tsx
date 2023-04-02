@@ -1,19 +1,23 @@
 import { Link } from 'react-router-dom'
 
 import {
-  fetchNotifications,
-  selectAllNotifications,
+  fetchNotificationsWebsocket,
+  selectNotificationsMetadata,
+  useGetNotificationsQuery,
 } from '../features/notifications/notifications-slice'
 import { useAppDispatch, useAppSelector } from './store'
 
 export const Navbar = () => {
   const dispatch = useAppDispatch()
-  const notifications = useAppSelector(selectAllNotifications)
-  const numUnreadNotifications = notifications.filter((n) => !n.read).length
+  useGetNotificationsQuery()
+
+  const notificationsMetadata = useAppSelector(selectNotificationsMetadata)
+  const numUnreadNotifications = notificationsMetadata.filter(
+    (n) => !n.read,
+  ).length
 
   const fetchNewNotifications = () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    dispatch(fetchNotifications())
+    dispatch(fetchNotificationsWebsocket())
   }
 
   return (

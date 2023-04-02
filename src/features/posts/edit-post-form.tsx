@@ -1,9 +1,7 @@
 import { useState, type ChangeEvent } from 'react'
-import { useDispatch } from 'react-redux'
 import { useHistory, type match } from 'react-router-dom'
 
-import { useAppSelector } from '../../app/store'
-import { postUpdated, selectPostById } from './posts-slice'
+import { useEditPostMutation, useGetPostQuery } from '../api/api-slice'
 
 type Props = {
   match: match<{ postId: string }>
@@ -12,12 +10,12 @@ type Props = {
 export const EditPostForm = ({ match }: Props) => {
   const { postId } = match.params
 
-  const post = useAppSelector((state) => selectPostById(state, postId))
+  const { data: post } = useGetPostQuery(postId)
+  const [updatePost, { isLoading }] = useEditPostMutation()
 
   const [title, setTitle] = useState(post?.title)
   const [content, setContent] = useState(post?.content)
 
-  const dispatch = useDispatch()
   const history = useHistory()
 
   const onTitleChanged = (e: ChangeEvent<HTMLInputElement>) =>
@@ -25,12 +23,10 @@ export const EditPostForm = ({ match }: Props) => {
   const onContentChanged = (e: ChangeEvent<HTMLTextAreaElement>) =>
     setContent(e.target.value)
 
-  const onSavePostClicked = () => {
+  const onSavePostClicked = async () => {
     if (title && content) {
-      dispatch(
-        postUpdated({ id: postId, title, content, reactions: post!.reactions }),
-      )
-      history.push(`/posts/${postId}`)
+      await updatePost({ id: postId, title, content }),
+        history.push(`/posts/${postId}`)
     }
   }
 
@@ -55,6 +51,8 @@ export const EditPostForm = ({ match }: Props) => {
           onChange={onContentChanged}
         />
       </form>
+
+      {/* eslint-disable-next-line @typescript-eslint/no-misused-promises */}
       <button type="button" onClick={onSavePostClicked}>
         Save Post
       </button>

@@ -6,13 +6,15 @@ import { useAppDispatch, useAppSelector } from '../../app/store'
 import { selectAllUsers } from '../users/users-slice'
 import {
   allNotificationsRead,
-  selectAllNotifications,
+  selectMetadataEntities,
+  useGetNotificationsQuery,
 } from './notifications-slice'
 
 export const NotificationsList = () => {
   const dispatch = useAppDispatch()
-  const notifications = useAppSelector(selectAllNotifications)
-  const users = useAppSelector((state) => selectAllUsers(state.users))
+  const { data: notifications = [] } = useGetNotificationsQuery()
+  const notificationsMetadata = useAppSelector(selectMetadataEntities)
+  const users = useAppSelector((state) => selectAllUsers(state))
 
   useLayoutEffect(() => {
     dispatch(allNotificationsRead())
@@ -29,8 +31,10 @@ export const NotificationsList = () => {
           name: 'Unknown User',
         }
 
+        const metadata = notificationsMetadata[notification.id]
+
         const notificationClassname = clsx('notification', {
-          new: notification.isNew,
+          new: metadata?.isNew,
         })
 
         return (

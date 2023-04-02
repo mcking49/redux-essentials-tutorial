@@ -1,14 +1,14 @@
-import { type EntityId } from '@reduxjs/toolkit'
-
-import { useAppSelector } from '../../app/store'
+import { useAppSelector, type RootState } from '../../app/store'
 import { selectUserById } from '../users/users-slice'
 
 type Props = {
-  userId: EntityId
+  userId: string
 }
 
 export const PostAuthor = ({ userId }: Props) => {
-  const author = useAppSelector((state) => selectUserById(state.users, userId))
+  const author = useAppSelector((state: RootState) =>
+    selectUserById(state, userId),
+  )
 
   return <span>by {author ? author.name : 'Unknown author'}</span>
 }

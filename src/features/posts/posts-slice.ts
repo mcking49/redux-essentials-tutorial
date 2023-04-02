@@ -49,62 +49,6 @@ const postsAdapter = createEntityAdapter({
   sortComparer: (a: Post, b: Post) => b.date.localeCompare(a.date),
 })
 
-const initialState = postsAdapter.getInitialState({
-  status: 'idle' as Status,
-  error: null as string | null | undefined,
-})
-
-const postsSlice = createSlice({
-  name: 'posts',
-  initialState,
-  reducers: {
-    postUpdated(state, action: PayloadAction<Post>) {
-      const { id, title, content } = action.payload
-      const existingPost = state.entities[id]
-
-      if (existingPost) {
-        existingPost.title = title
-        existingPost.content = content
-      }
-    },
-
-    reactionAdded(
-      state,
-      action: PayloadAction<{
-        postId: Post['id']
-        reaction: keyof Post['reactions']
-      }>,
-    ) {
-      const { postId, reaction } = action.payload
-      const existingPost = state.entities[postId]
-
-      if (existingPost) {
-        existingPost.reactions[reaction]++
-      }
-    },
-  },
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchPosts.pending, (state) => {
-        state.status = 'loading'
-      })
-      .addCase(fetchPosts.fulfilled, (state, action) => {
-        state.status = 'succeeded'
-        postsAdapter.upsertMany(state, action.payload)
-      })
-      .addCase(fetchPosts.rejected, (state, action) => {
-        state.status = 'failed'
-        state.error = action.error.message
-      })
-      // eslint-disable-next-line @typescript-eslint/unbound-method
-      .addCase(addNewPost.fulfilled, postsAdapter.addOne)
-  },
-})
-
-export default postsSlice.reducer
-
-export const { postUpdated, reactionAdded } = postsSlice.actions
-
 export const {
   selectAll: selectAllPosts,
   selectById: selectPostById,
@@ -113,5 +57,5 @@ export const {
 
 export const selectPostsByUser = createSelector(
   [selectAllPosts, (_state: RootState, userId: string) => userId],
-  (posts, userId) => posts.filter((post) => post.user === userId),
+  (posts, userId) => posts.filter((post: Post) => post.user === userId),
 )

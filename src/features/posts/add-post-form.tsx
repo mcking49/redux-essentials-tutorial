@@ -9,7 +9,7 @@ export const AddPostForm = () => {
   const [content, setContent] = useState('')
   const [userId, setUserId] = useState('')
   const [addNewPost, { isLoading }] = useAddNewPostMutation()
-  const users = useAppSelector((state) => selectAllUsers(state.users))
+  const users = useAppSelector(selectAllUsers)
 
   const onTitleChanged = (e: ChangeEvent<HTMLInputElement>) =>
     setTitle(e.target.value)
@@ -35,7 +35,7 @@ export const AddPostForm = () => {
     }
   }
 
-  const usersOptions = users.map((user) => (
+  const usersOptions = users?.map((user) => (
     <option key={user.id} value={user.id}>
       {user.name}
     </option>

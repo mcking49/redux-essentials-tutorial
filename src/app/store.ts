@@ -7,15 +7,11 @@ import {
 
 import { apiSlice } from '../features/api/api-slice'
 import notificationsReducer from '../features/notifications/notifications-slice'
-import postsReducer from '../features/posts/posts-slice'
-import usersReducer from '../features/users/users-slice'
 
 const store = configureStore({
   reducer: {
-    notifications: notificationsReducer,
-    posts: postsReducer,
-    users: usersReducer,
     [apiSlice.reducerPath]: apiSlice.reducer,
+    notifications: notificationsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(apiSlice.middleware),
